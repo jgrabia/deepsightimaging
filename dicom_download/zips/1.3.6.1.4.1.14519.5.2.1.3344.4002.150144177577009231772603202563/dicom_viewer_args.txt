@@ -1,0 +1,1 @@
+Arguments: ['C:\\Users\\grabes\\dist\\tcia_dicom_downloader_gui.exe', 'C:\\MRIAPP\\dicom_download\\zips\\1.3.6.1.4.1.14519.5.2.1.3344.4002.150144177577009231772603202563\\00000023.dcm']

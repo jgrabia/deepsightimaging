@@ -1,20 +1,5 @@
-# Multi-stage build for DeepSight Imaging AI
-
-# Stage 1: Build React frontend
-FROM node:18-alpine AS frontend-build
-
-WORKDIR /app/frontend
-COPY package*.json ./
-    RUN npm install
-
-COPY src/ ./src/
-COPY public/ ./public/
-COPY tsconfig.json ./
-
-RUN npm run build
-
-# Stage 2: Python backend
-FROM python:3.11-slim AS backend
+# Simple Dockerfile for DeepSight Imaging AI
+FROM python:3.11-slim
 
 WORKDIR /app
 
@@ -24,17 +9,26 @@ RUN apt-get update && apt-get install -y \
     g++ \
     libffi-dev \
     libssl-dev \
+    curl \
     && rm -rf /var/lib/apt/lists/*
+
+# Install Node.js
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs
 
 # Copy requirements and install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy backend code
-COPY backend/ ./backend/
+# Copy package.json and install Node dependencies
+COPY package.json .
+RUN npm install
 
-# Copy built frontend from previous stage
-COPY --from=frontend-build /app/frontend/build ./frontend/build
+# Copy all source files
+COPY . .
+
+# Build React app
+RUN npm run build
 
 # Create directories for DICOM processing
 RUN mkdir -p /app/data/dicom_incoming \
