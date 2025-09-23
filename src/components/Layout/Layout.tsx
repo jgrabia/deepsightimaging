@@ -22,7 +22,7 @@ import {
   Dashboard as DashboardIcon,
   Visibility as ViewerIcon,
   Psychology as AIIcon,
-  Workflow as WorkflowIcon,
+  AccountTree as WorkflowIcon,
   TrendingUp as TrainingIcon,
   Settings as SettingsIcon,
   CloudUpload as CloudIcon,
