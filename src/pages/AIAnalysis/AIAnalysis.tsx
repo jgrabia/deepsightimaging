@@ -243,7 +243,7 @@ const AIAnalysis: React.FC = () => {
               setSelectedModels(prev => [...prev, model.id]);
             }
           }}
-          color={selectedModels.includes(model.id) ? 'primary' : 'default'}
+          color={selectedModels.includes(model.id) ? 'primary' : 'inherit'}
           variant={selectedModels.includes(model.id) ? 'contained' : 'outlined'}
         >
           {selectedModels.includes(model.id) ? 'Selected' : 'Select'}
