@@ -27,8 +27,8 @@ RUN npm install
 # Copy all source files
 COPY . .
 
-# Build React app
-RUN npm run build
+# Build React app and move to frontend directory
+RUN npm run build && mkdir -p frontend && mv build frontend/
 
 # Create directories for DICOM processing
 RUN mkdir -p /app/data/dicom_incoming \
