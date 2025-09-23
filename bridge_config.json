@@ -1,0 +1,12 @@
+{
+  "dicom_ae_title": "DEEPSIGHT_BRIDGE",
+  "dicom_port": 104,
+  "dicom_host": "0.0.0.0",
+  "api_base_url": "https://api.deepsightimaging.ai",
+  "api_token": "YOUR_API_TOKEN_HERE",
+  "customer_id": "YOUR_CUSTOMER_ID_HERE",
+  "max_retries": 3,
+  "timeout": 300,
+  "log_level": "INFO"
+}
+

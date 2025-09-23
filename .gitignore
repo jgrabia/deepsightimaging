@@ -15,6 +15,14 @@ dist/
 .env.test.local
 .env.production.local
 
+# AWS credentials
+*Access Key*
+*Secret Key*
+*.pem
+*.key
+aws-credentials*
+credentials*
+
 # IDE files
 .vscode/
 .idea/
