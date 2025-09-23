@@ -1,1 +1,0 @@
-Arguments: ['C:\\Users\\grabes\\dist\\tcia_dicom_downloader_gui.exe', 'C:\\MRIAPP\\dicom_download\\images\\manifest-1617905855234\\Breast-Cancer-Screening-DBT\\DBT-P00024\\01-01-2000-DBT-S03255-MAMMO SCREENING DIGITAL BILATERAL-57165\\14783.000000-NA-53289\\1-1.dcm']
