@@ -11,7 +11,6 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { useMutation } from 'react-query';
-import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 interface LoginProps {
@@ -21,7 +20,6 @@ interface LoginProps {
 const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const navigate = useNavigate();
 
   const loginMutation = useMutation(
     async (credentials: { username: string; password: string }) => {
