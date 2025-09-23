@@ -38,7 +38,7 @@ credentials*
 ehthumbs.db
 Thumbs.db
 
-# Python
+# Python files and training data
 __pycache__/
 *.py[cod]
 *$py.class
@@ -87,3 +87,45 @@ temp/
 
 # Local development
 .local/
+
+# All Python files except backend/
+*.py
+!backend/*.py
+!requirements.txt
+
+# All Streamlit files
+*_app.py
+*_workflow.py
+*_config.py
+*_bridge.py
+*_setup.py
+*_guide.py
+
+# Training scripts
+train_*.py
+*_training*.py
+*_training_*.py
+
+# Data directories
+data/
+images/
+models/
+checkpoints/
+
+# Large data files
+*.zip
+*.tar
+*.tar.gz
+*.rar
+*.7z
+
+# Keep only essential React app files
+!src/
+!public/
+!package.json
+!package-lock.json
+!tsconfig.json
+!Dockerfile
+!docker-compose.yml
+!deploy.sh
+!README_REACT_PIVOT.md
