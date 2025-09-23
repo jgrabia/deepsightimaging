@@ -131,7 +131,11 @@ const DICOMViewer: React.FC = () => {
 
   // File dropzone
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop: onDrop.mutate,
+    onDrop: (acceptedFiles: File[]) => {
+      if (acceptedFiles.length > 0) {
+        onDrop.mutate(acceptedFiles);
+      }
+    },
     accept: {
       'application/dicom': ['.dcm', '.dicom']
     },
