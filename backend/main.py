@@ -98,8 +98,15 @@ app.add_middleware(
 # Mount static files for React app
 frontend_path = Path(__file__).parent.parent / "frontend" / "build"
 if frontend_path.exists():
-    app.mount("/static", StaticFiles(directory=str(frontend_path / "static")), name="static")
-    app.mount("/assets", StaticFiles(directory=str(frontend_path / "assets")), name="assets")
+    # Mount static files if they exist
+    static_path = frontend_path / "static"
+    if static_path.exists():
+        app.mount("/static", StaticFiles(directory=str(static_path)), name="static")
+    
+    # Mount other assets if they exist
+    assets_path = frontend_path / "assets"
+    if assets_path.exists():
+        app.mount("/assets", StaticFiles(directory=str(assets_path)), name="assets")
 
 # Security
 security = HTTPBearer()
