@@ -1,0 +1,1 @@
+Arguments: ['tcia_dicom_downloader_gui.py']

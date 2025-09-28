@@ -68,6 +68,17 @@ const DICOMViewerAPI: React.FC = () => {
   const [noiseReduction, setNoiseReduction] = useState(false);
   const [selectedPreset, setSelectedPreset] = useState('soft_tissue');
   
+  // Cine mode controls
+  const [cineMode, setCineMode] = useState(false);
+  const [cineSpeed, setCineSpeed] = useState(1.0);
+  const [cineInterval, setCineInterval] = useState<NodeJS.Timeout | null>(null);
+  
+  // Zoom and Pan controls
+  const [zoomLevel, setZoomLevel] = useState(1.0);
+  const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  
   // Presets
   const [presets, setPresets] = useState<Record<string, WindowLevelPreset>>({});
   
@@ -78,6 +89,15 @@ const DICOMViewerAPI: React.FC = () => {
   useEffect(() => {
     loadPresets();
   }, []);
+
+  // Cleanup cine mode interval on unmount
+  useEffect(() => {
+    return () => {
+      if (cineInterval) {
+        clearInterval(cineInterval);
+      }
+    };
+  }, [cineInterval]);
 
   const loadPresets = async () => {
     try {
@@ -194,6 +214,87 @@ const DICOMViewerAPI: React.FC = () => {
     loadSlice(currentSlice); // Reload current slice with new enhancements
   };
 
+  // Cine mode functions
+  const startCineMode = () => {
+    if (cineInterval) {
+      clearInterval(cineInterval);
+    }
+    
+    const interval = setInterval(() => {
+      setCurrentSlice((prevSlice) => {
+        const nextSlice = prevSlice + 1;
+        if (nextSlice >= totalSlices) {
+          return 0; // Loop back to start
+        }
+        loadSlice(nextSlice);
+        return nextSlice;
+      });
+    }, 1000 / cineSpeed);
+    
+    setCineInterval(interval);
+  };
+
+  const stopCineMode = () => {
+    if (cineInterval) {
+      clearInterval(cineInterval);
+      setCineInterval(null);
+    }
+  };
+
+  const handleCineModeToggle = (checked: boolean) => {
+    setCineMode(checked);
+    if (checked) {
+      startCineMode();
+    } else {
+      stopCineMode();
+    }
+  };
+
+  const handleCineSpeedChange = (speed: number) => {
+    setCineSpeed(speed);
+    if (cineMode) {
+      stopCineMode();
+      startCineMode();
+    }
+  };
+
+  // Zoom and Pan functions
+  const handleZoomIn = () => {
+    setZoomLevel(prev => Math.min(prev * 1.2, 5.0));
+  };
+
+  const handleZoomOut = () => {
+    setZoomLevel(prev => Math.max(prev / 1.2, 0.1));
+  };
+
+  const resetView = () => {
+    setZoomLevel(1.0);
+    setPanOffset({ x: 0, y: 0 });
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (e.button === 1) { // Middle mouse button for panning
+      setIsDragging(true);
+      setDragStart({ x: e.clientX, y: e.clientY });
+    }
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (isDragging) {
+      const deltaX = e.clientX - dragStart.x;
+      const deltaY = e.clientY - dragStart.y;
+      setPanOffset(prev => ({
+        x: prev.x + deltaX,
+        y: prev.y + deltaY
+      }));
+      setDragStart({ x: e.clientX, y: e.clientY });
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
   // File dropzone
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop: (acceptedFiles: File[]) => {
@@ -298,19 +399,64 @@ const DICOMViewerAPI: React.FC = () => {
               
               {currentImage && (
                 <Box sx={{ textAlign: 'center' }}>
-                  <img
-                    src={currentImage}
-                    alt={`Slice ${currentSlice + 1}`}
-                    style={{
-                      maxWidth: '100%',
-                      maxHeight: '600px',
+                  <Box
+                    sx={{
+                      overflow: 'hidden',
                       border: '1px solid #ccc',
-                      borderRadius: '4px'
+                      borderRadius: '4px',
+                      position: 'relative',
+                      maxHeight: '600px',
+                      cursor: isDragging ? 'grabbing' : 'grab'
                     }}
-                  />
-                  <Typography variant="body2" sx={{ mt: 1 }}>
-                    Slice {currentSlice + 1} of {totalSlices}
-                  </Typography>
+                    onMouseDown={handleMouseDown}
+                    onMouseMove={handleMouseMove}
+                    onMouseUp={handleMouseUp}
+                    onMouseLeave={handleMouseUp}
+                  >
+                    <img
+                      src={currentImage}
+                      alt={`Slice ${currentSlice + 1}`}
+                      style={{
+                        transform: `scale(${zoomLevel}) translate(${panOffset.x / zoomLevel}px, ${panOffset.y / zoomLevel}px)`,
+                        transformOrigin: 'center',
+                        maxWidth: 'none',
+                        height: 'auto',
+                        transition: isDragging ? 'none' : 'transform 0.1s ease'
+                      }}
+                    />
+                  </Box>
+                  
+                  <Box sx={{ mt: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography variant="body2">
+                      Slice {currentSlice + 1} of {totalSlices}
+                    </Typography>
+                    
+                    <Box sx={{ display: 'flex', gap: 1 }}>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={handleZoomOut}
+                        disabled={zoomLevel <= 0.1}
+                      >
+                        Zoom Out
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={resetView}
+                      >
+                        Reset
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={handleZoomIn}
+                        disabled={zoomLevel >= 5.0}
+                      >
+                        Zoom In
+                      </Button>
+                    </Box>
+                  </Box>
                 </Box>
               )}
             </CardContent>
@@ -341,21 +487,50 @@ const DICOMViewerAPI: React.FC = () => {
                     valueLabelFormat={(value) => value + 1}
                   />
                   
-                  <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
+                  <Box sx={{ mt: 2, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                     <Button
                       variant="outlined"
                       onClick={() => loadSlice(Math.max(0, currentSlice - 1))}
-                      disabled={currentSlice === 0}
+                      disabled={currentSlice === 0 || cineMode}
                     >
                       Previous
                     </Button>
                     <Button
                       variant="outlined"
                       onClick={() => loadSlice(Math.min(totalSlices - 1, currentSlice + 1))}
-                      disabled={currentSlice === totalSlices - 1}
+                      disabled={currentSlice === totalSlices - 1 || cineMode}
                     >
                       Next
                     </Button>
+                  </Box>
+
+                  {/* Cine Mode Controls */}
+                  <Box sx={{ mt: 2 }}>
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={cineMode}
+                          onChange={(e) => handleCineModeToggle(e.target.checked)}
+                        />
+                      }
+                      label="🎬 Cine Mode (Auto-play)"
+                    />
+                    
+                    {cineMode && (
+                      <Box sx={{ mt: 1 }}>
+                        <Typography gutterBottom>
+                          Cine Speed: {cineSpeed.toFixed(1)} slices/sec
+                        </Typography>
+                        <Slider
+                          value={cineSpeed}
+                          onChange={(e, value) => handleCineSpeedChange(value as number)}
+                          min={0.1}
+                          max={5.0}
+                          step={0.1}
+                          valueLabelDisplay="auto"
+                        />
+                      </Box>
+                    )}
                   </Box>
                 </CardContent>
               </Card>
@@ -497,6 +672,44 @@ const DICOMViewerAPI: React.FC = () => {
               </Card>
             </Grid>
           </Grid>
+
+          {/* AI Integration Section */}
+          <Card sx={{ mt: 3 }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                🤖 AI Analysis Integration
+              </Typography>
+              
+              <Grid container spacing={2}>
+                <Grid item xs={6}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    fullWidth
+                    onClick={() => {
+                      // TODO: Implement AI analysis
+                      toast.info('AI Analysis feature coming soon!');
+                    }}
+                  >
+                    🔍 Run AI Analysis
+                  </Button>
+                </Grid>
+                <Grid item xs={6}>
+                  <Button
+                    variant="outlined"
+                    color="secondary"
+                    fullWidth
+                    onClick={() => {
+                      // TODO: Navigate to training monitor
+                      toast.info('Training Monitor feature coming soon!');
+                    }}
+                  >
+                    📊 View Training Progress
+                  </Button>
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
         </>
       )}
     </Box>
