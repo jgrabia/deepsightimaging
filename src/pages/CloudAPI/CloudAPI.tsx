@@ -122,8 +122,8 @@ function CloudAPI() {
         setSearchResults(data);
         toast.success(`Found ${data.length} series`);
       },
-      onError: (error) => {
-        toast.error('Search failed: ' + error.message);
+      onError: (error: any) => {
+        toast.error('Search failed: ' + (error?.message || error));
       }
     }
   );
@@ -142,8 +142,8 @@ function CloudAPI() {
         toast.success(`Downloaded ${data.downloadedCount} series to cloud storage`);
         setSelectedSeries([]);
       },
-      onError: (error) => {
-        toast.error('Download failed: ' + error.message);
+      onError: (error: any) => {
+        toast.error('Download failed: ' + (error?.message || error));
       }
     }
   );
