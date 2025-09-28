@@ -232,7 +232,7 @@ async def upload_dicom(file: UploadFile = File(...)):
             current_slice = 0
         
         # Store in global state
-        global current_dicom_data, current_annotations, current_slice
+        global current_dicom_data, current_annotations
         current_dicom_data = {
             'ds': ds,
             'pixel_array': pixel_array,
