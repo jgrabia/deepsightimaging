@@ -688,7 +688,7 @@ const DICOMViewerAPI: React.FC = () => {
                     fullWidth
                     onClick={() => {
                       // TODO: Implement AI analysis
-                      toast.info('AI Analysis feature coming soon!');
+                      toast('AI Analysis feature coming soon!', { icon: 'ℹ️' });
                     }}
                   >
                     🔍 Run AI Analysis
@@ -701,7 +701,7 @@ const DICOMViewerAPI: React.FC = () => {
                     fullWidth
                     onClick={() => {
                       // TODO: Navigate to training monitor
-                      toast.info('Training Monitor feature coming soon!');
+                      toast('Training Monitor feature coming soon!', { icon: 'ℹ️' });
                     }}
                   >
                     📊 View Training Progress
