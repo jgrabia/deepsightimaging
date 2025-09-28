@@ -8,7 +8,7 @@ import { Toaster } from 'react-hot-toast';
 // Components
 import Layout from './components/Layout/Layout';
 import Dashboard from './pages/Dashboard/Dashboard';
-import DICOMViewer from './pages/DICOMViewer/DICOMViewer';
+import DICOMViewer from './pages/DICOMViewer/DICOMViewerAPI';
 import AIAnalysis from './pages/AIAnalysis/AIAnalysis';
 import Workflow from './pages/Workflow/Workflow';
 import TrainingMonitor from './pages/TrainingMonitor/TrainingMonitor';
