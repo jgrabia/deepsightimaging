@@ -22,7 +22,7 @@ import { useDropzone } from 'react-dropzone';
 import toast from 'react-hot-toast';
 
 // API Configuration
-const API_BASE_URL = process.env.REACT_APP_AWS_API_URL || 'http://localhost:8000';
+const API_BASE_URL = process.env.REACT_APP_AWS_API_URL || 'http://44.213.58.5:8000';
 
 interface DICOMInfo {
   patient_id: string;
