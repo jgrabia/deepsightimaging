@@ -14,6 +14,7 @@ import Workflow from './pages/Workflow/CompleteWorkflow';
 import TrainingMonitor from './pages/TrainingMonitor/RealTrainingMonitor';
 import Settings from './pages/Settings/Settings';
 import CloudAPI from './pages/CloudAPI/CloudAPI';
+import TestConnection from './pages/TestConnection/TestConnection';
 import Login from './pages/Login/Login';
 
 // Create theme
@@ -93,6 +94,7 @@ function App() {
               <Route path="/training" element={<TrainingMonitor />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/cloud-api" element={<CloudAPI />} />
+              <Route path="/test-connection" element={<TestConnection />} />
               <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </Routes>
           </Layout>

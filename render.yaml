@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: deepsightimaging
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: REACT_APP_AWS_API_URL
+        value: http://3.88.157.239:8000
