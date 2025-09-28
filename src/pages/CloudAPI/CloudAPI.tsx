@@ -39,7 +39,9 @@ import { useQuery, useMutation } from 'react-query';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
-const API_BASE_URL = process.env.REACT_APP_AWS_API_URL || 'http://3.88.157.239:8000';
+// Use local mock data instead of AWS server
+const USE_MOCK_DATA = true;
+const API_BASE_URL = USE_MOCK_DATA ? '' : process.env.REACT_APP_AWS_API_URL || 'http://3.88.157.239:8000';
 
 interface TCIAConfig {
   nbiaUrl: string;
@@ -90,6 +92,9 @@ function CloudAPI() {
   const { data: collections } = useQuery(
     'tcia-collections',
     async () => {
+      if (USE_MOCK_DATA) {
+        return ['Breast-Cancer-Screening-DBT', 'CBIS-DDSM', 'INbreast', 'MIAS'];
+      }
       const response = await axios.get(`${API_BASE_URL}/api/tcia/collections`);
       return response.data;
     },
@@ -102,6 +107,9 @@ function CloudAPI() {
   const { data: bodyParts } = useQuery(
     'tcia-body-parts',
     async () => {
+      if (USE_MOCK_DATA) {
+        return ['BREAST', 'CHEST', 'ABDOMEN', 'HEAD'];
+      }
       const response = await axios.get(`${API_BASE_URL}/api/tcia/body-parts`);
       return response.data;
     },
@@ -114,6 +122,33 @@ function CloudAPI() {
   // Search TCIA series
   const searchMutation = useMutation(
     async (searchFilters: TCIAFilter) => {
+      if (USE_MOCK_DATA) {
+        // Return mock search results
+        return [
+          {
+            SeriesInstanceUID: '1.2.3.4.5.6.7.8.9.10',
+            PatientID: 'DBT-P00013',
+            StudyInstanceUID: '1.2.3.4.5.6.7.8.9.11',
+            SeriesDescription: 'DBT Series',
+            Modality: 'MG',
+            BodyPartExamined: 'BREAST',
+            Manufacturer: 'HOLOGIC',
+            NumberOfImages: 75,
+            Collection: 'Breast-Cancer-Screening-DBT'
+          },
+          {
+            SeriesInstanceUID: '1.2.3.4.5.6.7.8.9.12',
+            PatientID: 'DBT-P00024',
+            StudyInstanceUID: '1.2.3.4.5.6.7.8.9.13',
+            SeriesDescription: 'DBT Series',
+            Modality: 'MG',
+            BodyPartExamined: 'BREAST',
+            Manufacturer: 'HOLOGIC',
+            NumberOfImages: 73,
+            Collection: 'Breast-Cancer-Screening-DBT'
+          }
+        ];
+      }
       const response = await axios.post(`${API_BASE_URL}/api/tcia/search`, searchFilters);
       return response.data;
     },
