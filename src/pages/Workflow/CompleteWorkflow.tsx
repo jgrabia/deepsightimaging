@@ -85,42 +85,54 @@ function CompleteWorkflow() {
   // TCIA Search
   const handleSearch = async () => {
     setIsSearching(true);
-    // Simulate API call
-    setTimeout(() => {
-      const mockResults: TCIASeries[] = [
-        {
-          SeriesInstanceUID: '1.2.3.4.5.6.7.8.9.10',
-          PatientID: 'DBT-P00013',
-          StudyInstanceUID: '1.2.3.4.5.6.7.8.9.11',
-          SeriesDescription: 'DBT Series',
-          Modality: 'MG',
-          BodyPartExamined: 'BREAST',
-          Manufacturer: 'HOLOGIC',
-          NumberOfImages: 75,
-          Collection: 'Breast-Cancer-Screening-DBT'
+    try {
+      const response = await fetch('http://3.88.157.239:8000/api/tcia/search', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        {
-          SeriesInstanceUID: '1.2.3.4.5.6.7.8.9.12',
-          PatientID: 'DBT-P00024',
-          StudyInstanceUID: '1.2.3.4.5.6.7.8.9.13',
-          SeriesDescription: 'DBT Series',
-          Modality: 'MG',
-          BodyPartExamined: 'BREAST',
-          Manufacturer: 'HOLOGIC',
-          NumberOfImages: 73,
-          Collection: 'Breast-Cancer-Screening-DBT'
-        }
-      ];
-      setSearchResults(mockResults);
+        body: JSON.stringify(searchFilters),
+      });
+      
+      if (response.ok) {
+        const results = await response.json();
+        setSearchResults(results);
+        toast.success(`Found ${results.length} series`);
+      } else {
+        throw new Error('Search failed');
+      }
+    } catch (error) {
+      console.error('Search error:', error);
+      toast.error('Failed to search TCIA database');
+    } finally {
       setIsSearching(false);
-      toast.success(`Found ${mockResults.length} series`);
-    }, 2000);
+    }
   };
 
   // File upload
-  const onDrop = (acceptedFiles: File[]) => {
-    setUploadedFiles(prev => [...prev, ...acceptedFiles]);
-    toast.success(`Uploaded ${acceptedFiles.length} files`);
+  const onDrop = async (acceptedFiles: File[]) => {
+    try {
+      const formData = new FormData();
+      acceptedFiles.forEach(file => {
+        formData.append('files', file);
+      });
+      
+      const response = await fetch('http://3.88.157.239:8000/api/files/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        setUploadedFiles(prev => [...prev, ...acceptedFiles]);
+        toast.success(`Uploaded ${acceptedFiles.length} files to AWS server`);
+      } else {
+        throw new Error('Upload failed');
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast.error('Failed to upload files to AWS server');
+    }
   };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -131,22 +143,57 @@ function CompleteWorkflow() {
     }
   });
 
-  // AI Analysis simulation
+  // AI Analysis
   const runAIAnalysis = async () => {
+    if (!currentImage) {
+      toast.error('Please select an image first');
+      return;
+    }
+    
     setIsAnalyzing(true);
-    // Simulate AI processing
-    setTimeout(() => {
-      setAiAnalysis({
-        confidence: 0.87,
-        findings: [
-          { type: 'Mass', location: 'Upper outer quadrant', confidence: 0.92 },
-          { type: 'Calcification', location: 'Central', confidence: 0.78 }
-        ],
-        recommendations: 'Follow-up recommended in 6 months'
+    try {
+      // First upload the file
+      const formData = new FormData();
+      formData.append('files', currentImage);
+      
+      const uploadResponse = await fetch('http://3.88.157.239:8000/api/files/upload', {
+        method: 'POST',
+        body: formData,
       });
+      
+      if (uploadResponse.ok) {
+        const uploadResult = await uploadResponse.json();
+        const uploadedFile = uploadResult.files[0];
+        
+        // Then run AI analysis
+        const analysisResponse = await fetch('http://3.88.157.239:8000/api/ai/analyze', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            image_path: uploadedFile.path,
+            model_name: 'deepedit',
+            confidence_threshold: 0.5
+          }),
+        });
+        
+        if (analysisResponse.ok) {
+          const analysisResult = await analysisResponse.json();
+          setAiAnalysis(analysisResult);
+          toast.success('AI analysis completed');
+        } else {
+          throw new Error('Analysis failed');
+        }
+      } else {
+        throw new Error('File upload failed');
+      }
+    } catch (error) {
+      console.error('AI analysis error:', error);
+      toast.error('Failed to run AI analysis');
+    } finally {
       setIsAnalyzing(false);
-      toast.success('AI analysis completed');
-    }, 3000);
+    }
   };
 
   const tabs = [

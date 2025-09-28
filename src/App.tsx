@@ -11,7 +11,7 @@ import Dashboard from './pages/Dashboard/Dashboard';
 import DICOMViewer from './pages/DICOMViewer/DICOMViewerAPI';
 import AIAnalysis from './pages/AIAnalysis/AIAnalysis';
 import Workflow from './pages/Workflow/CompleteWorkflow';
-import TrainingMonitor from './pages/TrainingMonitor/StandaloneTrainingMonitor';
+import TrainingMonitor from './pages/TrainingMonitor/RealTrainingMonitor';
 import Settings from './pages/Settings/Settings';
 import CloudAPI from './pages/CloudAPI/CloudAPI';
 import Login from './pages/Login/Login';
