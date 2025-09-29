@@ -5,7 +5,9 @@ import { useQuery, useMutation } from 'react-query';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
-const API_BASE_URL = process.env.REACT_APP_AWS_API_URL || 'http://3.88.157.239:8000';
+// Use AWS server endpoints (change to local for testing)
+const USE_LOCAL_SERVER = false; // Set to true for local testing
+const API_BASE_URL = USE_LOCAL_SERVER ? 'http://localhost:8001' : (process.env.REACT_APP_AWS_API_URL || 'http://3.88.157.239:8000');
 
 function RealTrainingMonitor() {
   // Fetch real training data from AWS server

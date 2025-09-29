@@ -43,6 +43,9 @@ import {
 import { useDropzone } from 'react-dropzone';
 import toast from 'react-hot-toast';
 
+// Use AWS server endpoints (change to local for testing)
+const USE_LOCAL_SERVER = false; // Set to true for local testing
+
 // Simulated data and functions (replace with real implementations)
 const mockCollections = [
   'Breast-Cancer-Screening-DBT',
@@ -86,7 +89,7 @@ function CompleteWorkflow() {
   const handleSearch = async () => {
     setIsSearching(true);
     try {
-      const response = await fetch('http://3.88.157.239:8000/api/tcia/search', {
+      const response = await fetch(`${USE_LOCAL_SERVER ? 'http://localhost:8001' : 'http://3.88.157.239:8000'}/api/tcia/search`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -117,7 +120,7 @@ function CompleteWorkflow() {
         formData.append('files', file);
       });
       
-      const response = await fetch('http://3.88.157.239:8000/api/files/upload', {
+      const response = await fetch(`${USE_LOCAL_SERVER ? 'http://localhost:8001' : 'http://3.88.157.239:8000'}/api/files/upload`, {
         method: 'POST',
         body: formData,
       });
@@ -156,7 +159,7 @@ function CompleteWorkflow() {
       const formData = new FormData();
       formData.append('files', currentImage);
       
-      const uploadResponse = await fetch('http://3.88.157.239:8000/api/files/upload', {
+      const uploadResponse = await fetch(`${USE_LOCAL_SERVER ? 'http://localhost:8001' : 'http://3.88.157.239:8000'}/api/files/upload`, {
         method: 'POST',
         body: formData,
       });
@@ -166,7 +169,7 @@ function CompleteWorkflow() {
         const uploadedFile = uploadResult.files[0];
         
         // Then run AI analysis
-        const analysisResponse = await fetch('http://3.88.157.239:8000/api/ai/analyze', {
+        const analysisResponse = await fetch(`${USE_LOCAL_SERVER ? 'http://localhost:8001' : 'http://3.88.157.239:8000'}/api/ai/analyze`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
