@@ -8,3 +8,5 @@ services:
     envVars:
       - key: REACT_APP_AWS_API_URL
         value: http://3.88.157.239:8000
+      - key: REACT_APP_USE_AWS
+        value: true
